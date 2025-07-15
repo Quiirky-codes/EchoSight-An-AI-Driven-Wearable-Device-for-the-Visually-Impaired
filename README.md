@@ -10,6 +10,27 @@ Together, these components deliver multimodal awareness to the user without requ
 
 -----
 
+### File Structure
+
+```
+
+EchoSight/
+├── node.cpp                     # NodeMCU firmware (serial + audio + Wi-Fi)
+├── esp32_cam.ino                # ESP32-CAM firmware (object + face detection)
+├── main.py                      # Python server to receive data from NodeMCU
+├── coco.names                   # Class labels for YOLOv4-tiny
+├── yolov4-tiny.cfg              # YOLOv4-tiny configuration file
+├── yolov4-tiny.weights          # Pretrained YOLOv4-tiny weights
+├── Dlib/
+│   └── dlib-19.22.0-cp38-cp38-win_amd64.whl   # Offline dlib installer (Windows)
+├── images/                      # Put in familiar faces, make sure to name the images with the respective names of the people.
+├── audio_files/
+├── simpleFaceRecognition.py    # Dlib-based face recognition demo
+├── requirements.txt            # Python dependencies for main.py
+
+```
+-----
+
 # Hardware Setup and Assembly
 Before running the code, ensure that:
 All components are properly wired and connected.
@@ -130,6 +151,7 @@ The NodeMCU will send HTTP POST requests to this address at the specified port (
 
 The server (typically using Flask) must be set up to accept incoming requests at the endpoint `/echo`. The Python code parses the JSON payload and either logs or speaks the received message using a text-to-speech engine.
 
+---
 
 ### Sensor-to-Audio Feedback Flow
 Once both microcontrollers are powered and running:
@@ -146,6 +168,107 @@ Once both microcontrollers are powered and running:
 * **Ultrasonic Alerts:** Simultaneously, the NodeMCU polls the HC-SR04 sensor every 250 ms. If an object is within a danger threshold (typically 1.5 meters), it overrides the current audio and plays an “obstacle warning” alert.
 
 This ensures real-time, hands-free, and multimodal environmental awareness for the user.
+
+---
+
+### Python-Based Receiver 
+For extended capabilities, EchoSight can also transmit sensor data or event logs over Wi-Fi to a Python script running on a PC or Raspberry Pi. The Python file, typically named main.py, acts as a lightweight server that listens on a local IP and port.
+**Execution Process:**
+1. Ensure that both the NodeMCU and the PC are connected to the same Wi-Fi network.
+
+2. Update the IP and port in the NodeMCU firmware and `main.py` script to match.
+
+3. Install the required Python libraries:
+
+   ```
+    pip install -r requirements.txt
+   ```
+4. Run the script:
+
+   ```
+   python main.py
+   ```
+This script will print incoming messages (e.g., "Obstacle ahead") and can optionally convert them to speech using pyttsx3 or other TTS libraries.
+
+5. Installing Dlib (Offline Fallback)
+In systems where `Dlib` fails to install via `pip` due to missing build tools, a precompiled wheel is included in the repository under the Dlib/ directory.
+
+To install manually:
+
+* Ensure you are using Python 3.8 (64-bit), as the wheel is compatible with this version.
+
+* Open a terminal in the root directory of the repository.
+
+* Run:
+  ```
+  pip install Dlib/dlib-19.22.0-cp38-cp38-win_amd64.whl
+  
+  ```
+Once installed, the face recognition script `simpleFaceRecognition.py` can be run to test known vs. unknown faces using the `images/` directory.
+
+6. Running Face Recognition Standalone (Optional)
+The `simpleFaceRecognition.py` script demonstrates how `Dlib` is used to encode known faces and compare them with test images. This can be used to validate that the Dlib module is working correctly.
+
+```
+python simpleFaceRecognition.py
+
+```
+
+7. Model Files and Deployment
+The following files are required for model inference:
+
+* `yolov4-tiny.cfg`: YOLO configuration
+
+* `yolov4-tiny.weights`: Pretrained weights (~22MB)
+
+* `coco.names`: Class labels used for detection
+
+The ESP32 firmware references these models, which must be converted to TensorFlow Lite format before deployment. This conversion is done offline during training/optimization, and the resulting `.tflite` file is embedded in the ESP32-CAM firmware.
+
+8. Final Execution Flow Summary
+Once assembled, flashed, and powered:
+
+* The ESP32-CAM captures frames, runs detection, and sends labels to the NodeMCU.
+
+* The NodeMCU converts those labels to audio commands and plays them.
+
+* The ultrasonic sensor provides redundancy and proximity alerts.
+
+* Optional Wi-Fi communication sends data to a central Python script for monitoring or additional feedback.
+
+* The user receives clear, real-time verbal cues about their environment, improving navigation and safety.
+
+-----
+
+### Project Documentation and Conference Paper
+
+All formal documentation related to the EchoSight project is organized within the `documents/` directory of this repository. This directory includes:
+
+* **Final Project Report:** A comprehensive technical report detailing the system design, hardware-software integration, embedded AI methodologies, evaluation metrics, and user testing. This report serves as the academic deliverable for institutional submission.
+
+* **Conference Paper:** The research paper titled "**EchoSight: An AI-Driven Wearable Device for Assisting the Visually Impaired**" was peer-reviewed and officially accepted for publication and presentation at the **2025 IEEE International Conference on Electronics, Computing and Communication Technologies (CONNECT)**. This paper presents the scientific and engineering contributions of the project, including architectural decisions, embedded inference techniques, sensor fusion, and real-world deployment outcomes.
+
+The paper is copyrighted under **IEEE**, and all rights are reserved. Redistribution or modification of the published paper without appropriate IEEE permission is prohibited. Readers and researchers are encouraged to cite the paper using the official IEEE citation once it becomes available in the conference proceedings.
+
+These documents serve as authoritative references for academic, industrial, or research-based engagements with the EchoSight system.
+
+-----
+
+### License
+
+This repository and all source code (excluding the conference paper) are distributed under the MIT License.
+
+Summary of the MIT License Terms:
+ * The software is provided "as is", without any express or implied warranty.
+
+ * Users are permitted to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software.
+
+ * Proper attribution to the original authors must be included in any distributed version or derivative work.
+
+ * The complete license text is available in the `LICENSE` file located at the root of this repository.
+
+Please note that while the project code is open-source under MIT terms, the conference paper remains copyrighted under **IEEE**.
+
 
 
 
