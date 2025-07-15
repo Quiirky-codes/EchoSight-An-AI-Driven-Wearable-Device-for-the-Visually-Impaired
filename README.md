@@ -10,7 +10,7 @@ Together, these components deliver multimodal awareness to the user without requ
 
 -----
 
-### File Structure
+# File Structure
 
 ```
 
@@ -47,7 +47,7 @@ You have:
 # Firmware Development and Flashing
 The device operates using two microcontrollers, each flashed with dedicated firmware using the Arduino IDE.
 
-### ESP32-CAM Firmware
+## ESP32-CAM Firmware
 The ESP32-CAM handles all image-based inference tasks. The firmware must include:
 * Camera initialization routines.
 
@@ -69,7 +69,7 @@ The ESP32-CAM handles all image-based inference tasks. The firmware must include
 
 The ESP32 will continuously analyze images and send result labels (e.g., “Person Left”, “Chair Ahead”) to the NodeMCU for further processing.
 
-### NodeMCU ESP8266 Firmware
+## NodeMCU ESP8266 Firmware
 The NodeMCU controls:
 
 * Audio output via the DFPlayer Mini.
@@ -101,7 +101,7 @@ In the EchoSight repository, the file `node.cpp` contains the complete Arduino-c
  * The `node.cpp` file is structured as an Arduino sketch (a `.ino` file in disguise), containing standard `setup()` and `loop()` functions required by Arduino’s microcontroller runtime.
 
 
-### Setting Up Arduino IDE for NodeMCU
+## Setting Up Arduino IDE for NodeMCU
 Before flashing the code in `node.cpp` onto the NodeMCU, the Arduino IDE must be configured appropriately to support the `ESP8266` board. This involves installing the board definitions and selecting the correct options.
 
 **Step-by-Step Configuration:**
@@ -111,9 +111,9 @@ Before flashing the code in `node.cpp` onto the NodeMCU, the Arduino IDE must be
 
 **2. Install ESP8266 Board Support**
 
-    * Open Arduino IDE.
+   * Open Arduino IDE.
     
-    * Navigate to: `File` → `Preferences`.
+   * Navigate to: `File` → `Preferences`.
 
 In the Additional Board Manager URLs field, add:
 
@@ -153,7 +153,7 @@ The server (typically using Flask) must be set up to accept incoming requests at
 
 ---
 
-### Sensor-to-Audio Feedback Flow
+# Sensor-to-Audio Feedback Flow
 Once both microcontrollers are powered and running:
 * **Image Capture and Inference:** The ESP32-CAM captures images at ~5 FPS and processes them locally using YOLOv4-tiny for object detection and Dlib for face recognition.
 
@@ -171,7 +171,7 @@ This ensures real-time, hands-free, and multimodal environmental awareness for t
 
 ---
 
-### Python-Based Receiver 
+# Python-Based Receiver 
 For extended capabilities, EchoSight can also transmit sensor data or event logs over Wi-Fi to a Python script running on a PC or Raspberry Pi. The Python file, typically named main.py, acts as a lightweight server that listens on a local IP and port.
 **Execution Process:**
 1. Ensure that both the NodeMCU and the PC are connected to the same Wi-Fi network.
@@ -240,7 +240,7 @@ Once assembled, flashed, and powered:
 
 -----
 
-### Project Documentation and Conference Paper
+# Project Documentation and Conference Paper
 
 All formal documentation related to the EchoSight project is organized within the `documents/` directory of this repository. This directory includes:
 
@@ -254,7 +254,7 @@ These documents serve as authoritative references for academic, industrial, or r
 
 -----
 
-### License
+# License
 
 This repository and all source code (excluding the conference paper) are distributed under the MIT License.
 
