@@ -25,7 +25,7 @@ You have:
 # Firmware Development and Flashing
 The device operates using two microcontrollers, each flashed with dedicated firmware using the Arduino IDE.
 
-## ESP32-CAM Firmware
+### ESP32-CAM Firmware
 The ESP32-CAM handles all image-based inference tasks. The firmware must include:
 * Camera initialization routines.
 
@@ -47,7 +47,7 @@ The ESP32-CAM handles all image-based inference tasks. The firmware must include
 
 The ESP32 will continuously analyze images and send result labels (e.g., “Person Left”, “Chair Ahead”) to the NodeMCU for further processing.
 
-## NodeMCU ESP8266 Firmware
+### NodeMCU ESP8266 Firmware
 The NodeMCU controls:
 
 * Audio output via the DFPlayer Mini.
@@ -65,3 +65,39 @@ The NodeMCU controls:
   * Flash the firmware via USB.
 
 The NodeMCU interprets the object/face labels and maps them to predefined audio MP3s (e.g., “001.mp3” = “Obstacle ahead”) and triggers playback via serial commands to the DFPlayer Mini. It also continuously monitors the ultrasonic sensor to detect physical obstacles and trigger alerts independently if needed.
+
+In the EchoSight repository, the file `node.cpp` contains the complete Arduino-compatible C++ code for the NodeMCU ESP8266 microcontroller. This microcontroller is responsible for several key functions in the system:
+
+ * Interfacing with the DFPlayer Mini: It sends UART commands to play specific MP3 audio files based on received labels (e.g., "Obstacle Ahead").
+
+ * Reading data from the HC-SR04 ultrasonic sensor: It continuously monitors the surroundings for obstacles and triggers warnings when nearby objects are detected.
+
+ * Receiving detection results from ESP32-CAM: It processes incoming serial data sent by the ESP32 after running object or face detection.
+
+ * Sending detection data to a Python backend `main.py`: It establishes a Wi-Fi connection and transmits key detection labels and alerts to a server via HTTP POST requests.
+
+ * The `node.cpp` file is structured as an Arduino sketch (a `.ino` file in disguise), containing standard `setup()` and `loop()` functions required by Arduino’s microcontroller runtime.
+
+
+### Setting Up Arduino IDE for NodeMCU
+Before flashing the code in `node.cpp` onto the NodeMCU, the Arduino IDE must be configured appropriately to support the `ESP8266` board. This involves installing the board definitions and selecting the correct options.
+
+**Step-by-Step Configuration:**
+1. Install Arduino IDE
+
+    * Download and install the Arduino IDE from the official Arduino website [www.arduino.cc](https://www.arduino.cc/en/software).
+
+2. Install ESP8266 Board Support
+
+    * Open Arduino IDE.
+    
+    * Navigate to: `File` → `Preferences`.
+
+In the Additional Board Manager URLs field, add:
+
+```http://arduino.esp8266.com/stable/package_esp8266com_index.json```
+
+   * Then go to: `Tools` → `Board` → `Boards Manager`.
+
+   * Search for ESP8266 and click Install.
+
